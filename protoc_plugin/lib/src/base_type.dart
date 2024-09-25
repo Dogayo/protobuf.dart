@@ -42,6 +42,42 @@ class BaseType {
       ? unprefixed
       : '${generator!.fileImportPrefix}.$unprefixed';
 
+  String onlyDart([String prefix = '']) {
+    final className = generator?.classname != null
+        ? '${generator!.classname}$prefix'
+        : 'dynamic';
+    switch (descriptor) {
+      case FieldDescriptorProto_Type.TYPE_BOOL:
+        return 'bool';
+      case FieldDescriptorProto_Type.TYPE_FLOAT:
+      case FieldDescriptorProto_Type.TYPE_DOUBLE:
+        return 'double';
+      case FieldDescriptorProto_Type.TYPE_INT32:
+      case FieldDescriptorProto_Type.TYPE_INT64:
+      case FieldDescriptorProto_Type.TYPE_UINT32:
+      case FieldDescriptorProto_Type.TYPE_UINT64:
+      case FieldDescriptorProto_Type.TYPE_SINT32:
+      case FieldDescriptorProto_Type.TYPE_SINT64:
+      case FieldDescriptorProto_Type.TYPE_FIXED32:
+      case FieldDescriptorProto_Type.TYPE_FIXED64:
+      case FieldDescriptorProto_Type.TYPE_SFIXED32:
+      case FieldDescriptorProto_Type.TYPE_SFIXED64:
+        return 'int';
+      case FieldDescriptorProto_Type.TYPE_BYTES:
+        return 'List<int>';
+      case FieldDescriptorProto_Type.TYPE_STRING:
+        return 'String';
+      case FieldDescriptorProto_Type.TYPE_ENUM:
+        return 'dynamic';
+      case FieldDescriptorProto_Type.TYPE_GROUP:
+        return 'List<$className>';
+      case FieldDescriptorProto_Type.TYPE_MESSAGE:
+        return className;
+      default:
+        return 'dynamic';
+    }
+  }
+
   /// Returns the name to use in generated code for this Dart type.
   ///
   /// Doesn't include the List type for repeated fields.

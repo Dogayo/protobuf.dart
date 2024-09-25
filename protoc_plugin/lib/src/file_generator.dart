@@ -116,6 +116,7 @@ class FileGenerator extends ProtobufContainer {
 
   final enumGenerators = <EnumGenerator>[];
   final messageGenerators = <MessageGenerator>[];
+  final entityGenerators = <EntityGenerator>[];
   final extensionGenerators = <ExtensionGenerator>[];
   final clientApiGenerators = <ClientApiGenerator>[];
   final serviceGenerators = <ServiceGenerator>[];
@@ -168,6 +169,8 @@ class FileGenerator extends ProtobufContainer {
     for (var i = 0; i < descriptor.messageType.length; i++) {
       messageGenerators.add(MessageGenerator.topLevel(descriptor.messageType[i],
           this, declaredMixins, defaultMixin, usedTopLevelNames, i));
+      entityGenerators
+          .add(EntityGenerator.topLevel(descriptor.messageType[i], this, i));
     }
     for (var i = 0; i < descriptor.extension.length; i++) {
       extensionGenerators.add(ExtensionGenerator.topLevel(
@@ -194,6 +197,9 @@ class FileGenerator extends ProtobufContainer {
 
     for (final m in messageGenerators) {
       m.resolve(ctx);
+    }
+    for (final x in entityGenerators) {
+      x.resolve(ctx);
     }
     for (final x in extensionGenerators) {
       x.resolve(ctx);
@@ -234,9 +240,11 @@ class FileGenerator extends ProtobufContainer {
 
     final mainWriter = generateMainFile(config);
     final enumWriter = generateEnumFile(config);
+    final entityWrite = generateEntityFile(config);
 
     final files = [
       makeFile('.pb.dart', mainWriter.toString()),
+      makeFile('_entity.dart', entityWrite.toString()),
       makeFile('.pbenum.dart', enumWriter.toString()),
       makeFile('.pbjson.dart', generateJsonFile(config)),
     ];
@@ -262,6 +270,19 @@ class FileGenerator extends ProtobufContainer {
   /// Creates an IndentingWriter with metadata generation enabled or disabled.
   IndentingWriter makeWriter() => IndentingWriter(
       filename: options.generateMetadata ? descriptor.name : null);
+
+  IndentingWriter generateEntityFile(
+      [OutputConfiguration config = const DefaultOutputConfiguration()]) {
+    if (!_linked) throw StateError('not linked');
+    final out = makeWriter();
+
+    // Generate code.
+    for (final m in entityGenerators) {
+      m.generate(out);
+    }
+
+    return out;
+  }
 
   /// Returns the contents of the .pb.dart file for this .proto file.
   IndentingWriter generateMainFile(
