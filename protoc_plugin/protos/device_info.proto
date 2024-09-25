@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package api;
+
+option java_package = "ru.vtb.feature.voice.impl.data";
+option java_multiple_files = true;
+option java_outer_classname = "DeviceInfoVoiceAssistantProto";
+
+/*
+* Информация о устройстве.
+*/
+message DeviceInfo {
+  /*
+  * ОС устройства(Android/iOs)
+  */
+  string osPlatform = 1;
+  /*
+  * Версия ос устройства.
+  */
+  string osVersion = 2;
+  /*
+  * Версия приложения.
+  */
+  string applicationVersion = 3;
+  /*
+  * Модель устройства.
+  */
+  string model = 4;
+  /*
+  * Производитель устройства.
+  */
+  string manufacturer = 5;
+}
