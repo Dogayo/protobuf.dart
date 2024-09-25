@@ -276,6 +276,8 @@ class FileGenerator extends ProtobufContainer {
     if (!_linked) throw StateError('not linked');
     final out = makeWriter();
 
+    out.println('import \'package:equatable/equatable.dart\';');
+
     // Generate code.
     for (final m in entityGenerators) {
       m.generate(out);
