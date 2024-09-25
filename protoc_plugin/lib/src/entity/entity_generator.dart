@@ -1,4 +1,4 @@
-part of '../protoc.dart';
+part of '../../protoc.dart';
 
 const _prefixEntity = 'Entity';
 
@@ -29,9 +29,8 @@ class EntityGenerator extends ProtobufContainer {
   final List<int> _fieldPathSegment;
   final DescriptorProto _descriptor;
   final List<EntityGenerator> _entityGenerators = <EntityGenerator>[];
+  final List<EnumEntityGenerator> _enumGenerators = <EnumEntityGenerator>[];
 
-  final List<List<ProtobufField>> _oneofFields;
-  late List<OneofNames> _oneofNames;
   late List<ProtobufField> _fieldList;
   bool _resolved = false;
 
@@ -49,12 +48,15 @@ class EntityGenerator extends ProtobufContainer {
         fullName = parent!.fullName == ''
             ? descriptor.name
             : '${parent.fullName}.${descriptor.name}',
-        _fieldPathSegment = [fieldIdTag, repeatedFieldIndex],
-        _oneofFields =
-            List.generate(countRealOneofs(descriptor), (int index) => []) {
+        _fieldPathSegment = [fieldIdTag, repeatedFieldIndex] {
     for (var i = 0; i < _descriptor.nestedType.length; i++) {
       final n = _descriptor.nestedType[i];
       _entityGenerators.add(EntityGenerator.nested(n, this, i));
+    }
+
+    for (var i = 0; i < _descriptor.enumType.length; i++) {
+      final e = _descriptor.enumType[i];
+      _enumGenerators.add(EnumEntityGenerator.nested(e, this, i));
     }
   }
 
@@ -82,13 +84,8 @@ class EntityGenerator extends ProtobufContainer {
     _fieldList = <ProtobufField>[];
     for (final names in members.fieldNames) {
       final field = ProtobufField.message(names, this, ctx);
-      if (field.descriptor.hasOneofIndex() &&
-          !field.descriptor.proto3Optional) {
-        _oneofFields[field.descriptor.oneofIndex].add(field);
-      }
       _fieldList.add(field);
     }
-    _oneofNames = members.oneofNames;
 
     for (final m in _entityGenerators) {
       m.resolve(ctx);
@@ -122,6 +119,7 @@ class EntityGenerator extends ProtobufContainer {
     }
     out.println();
 
+    /// Copy with
     out.println('$_className copyWith({');
     for (final field in _fieldList) {
       if (field.isRepeated) {
@@ -172,6 +170,8 @@ class EntityGenerator extends ProtobufContainer {
   }
 
   void generateEnums(IndentingWriter out) {
-    /// TODO: Generate enums
+    for (final e in _enumGenerators) {
+      e.generate(out);
+    }
   }
 }

@@ -117,6 +117,7 @@ class FileGenerator extends ProtobufContainer {
   final enumGenerators = <EnumGenerator>[];
   final messageGenerators = <MessageGenerator>[];
   final entityGenerators = <EntityGenerator>[];
+  final enumEntityGenerators = <EnumEntityGenerator>[];
   final extensionGenerators = <ExtensionGenerator>[];
   final clientApiGenerators = <ClientApiGenerator>[];
   final serviceGenerators = <ServiceGenerator>[];
@@ -165,6 +166,8 @@ class FileGenerator extends ProtobufContainer {
     for (var i = 0; i < descriptor.enumType.length; i++) {
       enumGenerators.add(EnumGenerator.topLevel(
           descriptor.enumType[i], this, usedTopLevelNames, i));
+      enumEntityGenerators
+          .add(EnumEntityGenerator.topLevel(descriptor.enumType[i], this, i));
     }
     for (var i = 0; i < descriptor.messageType.length; i++) {
       messageGenerators.add(MessageGenerator.topLevel(descriptor.messageType[i],
@@ -241,10 +244,12 @@ class FileGenerator extends ProtobufContainer {
     final mainWriter = generateMainFile(config);
     final enumWriter = generateEnumFile(config);
     final entityWrite = generateEntityFile(config);
+    final enumEntityWrite = generateEnumEntityFile(config);
 
     final files = [
       makeFile('.pb.dart', mainWriter.toString()),
       makeFile('_entity.dart', entityWrite.toString()),
+      makeFile('_enum.dart', enumEntityWrite.toString()),
       makeFile('.pbenum.dart', enumWriter.toString()),
       makeFile('.pbjson.dart', generateJsonFile(config)),
     ];
@@ -270,6 +275,23 @@ class FileGenerator extends ProtobufContainer {
   /// Creates an IndentingWriter with metadata generation enabled or disabled.
   IndentingWriter makeWriter() => IndentingWriter(
       filename: options.generateMetadata ? descriptor.name : null);
+
+  IndentingWriter generateEnumEntityFile(
+      [OutputConfiguration config = const DefaultOutputConfiguration()]) {
+    if (!_linked) throw StateError('not linked');
+    final out = makeWriter();
+
+    // Generate code.
+    for (final m in enumEntityGenerators) {
+      m.generate(out);
+    }
+
+    for (final e in entityGenerators) {
+      e.generateEnums(out);
+    }
+
+    return out;
+  }
 
   IndentingWriter generateEntityFile(
       [OutputConfiguration config = const DefaultOutputConfiguration()]) {
