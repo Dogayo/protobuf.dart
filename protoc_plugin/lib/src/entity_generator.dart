@@ -24,17 +24,16 @@ class EntityGenerator extends ProtobufContainer {
   @override
   final ProtobufContainer? parent;
 
+  String get _className => '$classname$_prefixEntity';
+
   final List<int> _fieldPathSegment;
   final DescriptorProto _descriptor;
   final List<EntityGenerator> _entityGenerators = <EntityGenerator>[];
 
   final List<List<ProtobufField>> _oneofFields;
   late List<OneofNames> _oneofNames;
-
   late List<ProtobufField> _fieldList;
   bool _resolved = false;
-
-  bool _hasImport = false;
 
   EntityGenerator._(
     DescriptorProto descriptor,
@@ -42,11 +41,11 @@ class EntityGenerator extends ProtobufContainer {
     int repeatedFieldIndex,
     int fieldIdTag,
   )   : _descriptor = descriptor,
-        classname = '${messageOrEnumClassName(
+        classname = messageOrEnumClassName(
           descriptor.name,
           {},
           parent: parent?.classname ?? '',
-        )}$_prefixEntity',
+        ).pascalCase,
         fullName = parent!.fullName == ''
             ? descriptor.name
             : '${parent.fullName}.${descriptor.name}',
@@ -97,50 +96,46 @@ class EntityGenerator extends ProtobufContainer {
   }
 
   void generate(IndentingWriter out) {
-    if (!_hasImport) {
-      /// Imports
-      out.println('import \'package:equatable/equatable.dart\';');
-      _hasImport = true;
-    }
-
     /// Start class
-    out.println('final class $classname extends Equatable  {');
+    out.println('class $_className extends Equatable  {');
 
     /// Contsructor
     out.println();
-    out.println('const $classname({');
+    out.println('const $_className({');
     for (final field in _fieldList) {
-      out.println('required this.${field.memberNames!.fieldName},');
+      final keyword = field.isRequired ? 'required' : '';
+      out.println('$keyword this.${field.memberNames!.fieldName},');
     }
     out.println('});');
     out.println();
 
     /// Final fields
     for (final field in _fieldList) {
-      out.println(
-          'final ${field.baseType.onlyDart(_prefixEntity)} ${field.memberNames!.fieldName};');
+      final nullable = !field.isRequired ? '?' : '';
+      if (field.isRepeated) {
+        out.println(
+            'final List<${field.baseType.onlyDart(_prefixEntity)}>$nullable ${field.memberNames!.fieldName};');
+      } else {
+        out.println(
+            'final ${field.baseType.onlyDart(_prefixEntity)}$nullable ${field.memberNames!.fieldName};');
+      }
     }
     out.println();
 
-    out.println('$classname copyWith({');
+    out.println('$_className copyWith({');
     for (final field in _fieldList) {
       if (field.isRepeated) {
         out.println(
-            '${field.baseType.onlyDart(_prefixEntity)}? ${field.memberNames!.fieldName},');
+            ' List<${field.baseType.onlyDart(_prefixEntity)}>? ${field.memberNames!.fieldName},');
       } else {
         out.println(
             '${field.baseType.onlyDart(_prefixEntity)}? ${field.memberNames!.fieldName},');
       }
     }
-    out.println('}) => $classname(');
+    out.println('}) => $_className(');
     for (final field in _fieldList) {
-      if (field.isRepeated) {
-        out.println(
-            '${field.memberNames!.fieldName}: ${field.memberNames!.fieldName} ?? this.${field.memberNames!.fieldName},');
-      } else {
-        out.println(
-            '${field.memberNames!.fieldName}: ${field.memberNames!.fieldName} ?? this.${field.memberNames!.fieldName},');
-      }
+      out.println(
+          '${field.memberNames!.fieldName}: ${field.memberNames!.fieldName} ?? this.${field.memberNames!.fieldName},');
     }
     out.println(');');
     out.println();
@@ -148,7 +143,7 @@ class EntityGenerator extends ProtobufContainer {
     /// ToString
     out.println();
     out.println('@override');
-    out.println('String toString() => \'$classname(\' + ');
+    out.println('String toString() => \'$_className(\' + ');
     final toString = _fieldList
         .map((e) =>
             "'${e.memberNames!.fieldName}: \$${e.memberNames!.fieldName}'")
@@ -168,5 +163,15 @@ class EntityGenerator extends ProtobufContainer {
     /// End class
     out.println();
     out.println('}');
+
+    out.println();
+
+    for (final m in _entityGenerators) {
+      m.generate(out);
+    }
+  }
+
+  void generateEnums(IndentingWriter out) {
+    /// TODO: Generate enums
   }
 }

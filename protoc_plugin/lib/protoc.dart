@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:protobuf/protobuf.dart';
+import 'package:recase/recase.dart';
 
 import 'const_generator.dart' show writeJsonConst;
 import 'indenting_writer.dart';

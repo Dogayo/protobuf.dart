@@ -44,7 +44,7 @@ class BaseType {
 
   String onlyDart([String prefix = '']) {
     final className = generator?.classname != null
-        ? '${generator!.classname}$prefix'
+        ? '${generator!.classname}$prefix'.pascalCase
         : 'dynamic';
     switch (descriptor) {
       case FieldDescriptorProto_Type.TYPE_BOOL:
