@@ -55,6 +55,7 @@ class BaseType {
       case FieldDescriptorProto_Type.TYPE_INT32:
       case FieldDescriptorProto_Type.TYPE_INT64:
       case FieldDescriptorProto_Type.TYPE_UINT32:
+      case FieldDescriptorProto_Type.TYPE_UINT64:
       case FieldDescriptorProto_Type.TYPE_SINT32:
       case FieldDescriptorProto_Type.TYPE_SINT64:
       case FieldDescriptorProto_Type.TYPE_FIXED32:

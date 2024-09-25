@@ -24,7 +24,6 @@ class EnumEntityGenerator extends ProtobufContainer {
   @override
   final ProtobufContainer parent;
 
-  final EnumDescriptorProto _descriptor;
   final List<EnumValueDescriptorProto> _canonicalValues =
       <EnumValueDescriptorProto>[];
   final List<EnumAlias> _aliases = <EnumAlias>[];
@@ -47,8 +46,7 @@ class EnumEntityGenerator extends ProtobufContainer {
             parent: parent.classname ?? ''),
         fullName = parent.fullName == ''
             ? descriptor.name
-            : '${parent.fullName}.${descriptor.name}',
-        _descriptor = descriptor {
+            : '${parent.fullName}.${descriptor.name}' {
     final usedNames = {...reservedEnumNames};
     for (var i = 0; i < descriptor.value.length; i++) {
       final value = descriptor.value[i];
