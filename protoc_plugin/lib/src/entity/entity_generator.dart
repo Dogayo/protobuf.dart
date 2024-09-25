@@ -174,4 +174,23 @@ class EntityGenerator extends ProtobufContainer {
       e.generate(out);
     }
   }
+
+  /// Adds dependencies of [generate] to [imports].
+  ///
+  /// For each .pb.dart file that the generated code needs to import,
+  /// add its generator.
+  void addImportsTo(
+      Set<FileGenerator> imports, Set<FileGenerator> enumImports) {
+    for (final field in _fieldList) {
+      final typeGen = field.baseType.generator;
+      if (typeGen is EnumEntityGenerator) {
+        enumImports.add(typeGen.fileGen!);
+      } else if (typeGen != null) {
+        imports.add(typeGen.fileGen!);
+      }
+    }
+    for (final m in _entityGenerators) {
+      m.addImportsTo(imports, enumImports);
+    }
+  }
 }

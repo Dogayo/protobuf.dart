@@ -300,6 +300,21 @@ class FileGenerator extends ProtobufContainer {
 
     out.println('import \'package:equatable/equatable.dart\';');
 
+    final importWriter = ImportWriter();
+
+    // Import the _entity.dart files we depend on.
+    final imports = Set<FileGenerator>.identity();
+    final enumImports = Set<FileGenerator>.identity();
+    _findEntityToImport(imports, enumImports);
+
+    for (final target in imports) {
+      final url = config.resolveImport(
+          target.protoFileUri, protoFileUri, '_entity.dart');
+      importWriter.addImport(url.toString());
+    }
+
+    out.println(importWriter.emit());
+
     // Generate code.
     for (final m in entityGenerators) {
       m.generate(out);
@@ -433,6 +448,17 @@ class FileGenerator extends ProtobufContainer {
     for (final x in serviceGenerators) {
       x.addImportsTo(imports);
     }
+    // Don't need to import self. (But we may need to import the enums.)
+    imports.remove(this);
+  }
+
+  /// Returns the generator for each .pb.dart file we need to import.
+  void _findEntityToImport(
+      Set<FileGenerator> imports, Set<FileGenerator> enumImports) {
+    for (final m in entityGenerators) {
+      m.addImportsTo(imports, enumImports);
+    }
+
     // Don't need to import self. (But we may need to import the enums.)
     imports.remove(this);
   }
