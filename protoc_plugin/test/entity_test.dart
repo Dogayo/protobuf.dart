@@ -1,3 +1,5 @@
+import 'package:fixnum/fixnum.dart';
+import 'package:protoc_plugin/src/generated/plugin.pb.dart';
 import 'package:test/test.dart';
 
 import '../out/descriptor.pb.dart';

@@ -1,6 +1,6 @@
 part of '../../protoc.dart';
 
-const _prefixEntity = 'Entity';
+const prefixEntity = 'Entity';
 
 class EntityGenerator extends ProtobufContainer {
   /// The name of the Dart class to generate.
@@ -24,7 +24,7 @@ class EntityGenerator extends ProtobufContainer {
   @override
   final ProtobufContainer? parent;
 
-  String get _className => '$classname$_prefixEntity';
+  String get _className => '$classname$prefixEntity'.pascalCase;
 
   final List<int> _fieldPathSegment;
   final DescriptorProto _descriptor;
@@ -44,7 +44,7 @@ class EntityGenerator extends ProtobufContainer {
           descriptor.name,
           {},
           parent: parent?.classname ?? '',
-        ).pascalCase,
+        ),
         fullName = parent!.fullName == ''
             ? descriptor.name
             : '${parent.fullName}.${descriptor.name}',
@@ -111,10 +111,10 @@ class EntityGenerator extends ProtobufContainer {
       final nullable = !field.isRequired ? '?' : '';
       if (field.isRepeated) {
         out.println(
-            'final List<${field.baseType.onlyDart(_prefixEntity)}>$nullable ${field.memberNames!.fieldName};');
+            'final List<${field.baseType.onlyDart(prefixEntity)}>$nullable ${field.memberNames!.fieldName};');
       } else {
         out.println(
-            'final ${field.baseType.onlyDart(_prefixEntity)}$nullable ${field.memberNames!.fieldName};');
+            'final ${field.baseType.onlyDart(prefixEntity)}$nullable ${field.memberNames!.fieldName};');
       }
     }
     out.println();
@@ -124,10 +124,10 @@ class EntityGenerator extends ProtobufContainer {
     for (final field in _fieldList) {
       if (field.isRepeated) {
         out.println(
-            ' List<${field.baseType.onlyDart(_prefixEntity)}>? ${field.memberNames!.fieldName},');
+            ' List<${field.baseType.onlyDart(prefixEntity)}>? ${field.memberNames!.fieldName},');
       } else {
         out.println(
-            '${field.baseType.onlyDart(_prefixEntity)}? ${field.memberNames!.fieldName},');
+            '${field.baseType.onlyDart(prefixEntity)}? ${field.memberNames!.fieldName},');
       }
     }
     out.println('}) => $_className(');

@@ -91,29 +91,5 @@ class EnumEntityGenerator extends ProtobufContainer {
     out.println();
     out.println('}');
     return;
-    for (var i = 0; i < _canonicalValues.length; i++) {
-      final value = _canonicalValues[i];
-      value.name;
-      final name = dartNames[value.name]!;
-      final fieldPathSegment = List.from(fieldPath)
-        ..addAll([_fieldPathSegment[0], _originalCanonicalIndices[i]]);
-
-      final commentBlock = fileGen?.commentBlock(fieldPathSegment.cast<int>());
-      if (commentBlock != null) {
-        out.println(commentBlock);
-      }
-      out.println('$name,');
-    }
-
-    if (_aliases.isNotEmpty) {
-      for (var i = 0; i < _aliases.length; i++) {
-        final alias = _aliases[i];
-        final name = dartNames[alias.value.name]!;
-        final fieldPathSegment = List.from(fieldPath)
-          ..addAll([_fieldPathSegment[0], _originalAliasIndices[i]]);
-        out.println('$name: $name,');
-      }
-    }
-    out.println('}');
   }
 }

@@ -31,3 +31,4 @@ part 'src/service_generator.dart';
 part 'src/well_known_types.dart';
 part 'src/entity/entity_generator.dart';
 part 'src/entity/enum_entity_generator.dart';
+part 'src/entity/mapper_generator.dart';

@@ -68,13 +68,34 @@ class BaseType {
       case FieldDescriptorProto_Type.TYPE_STRING:
         return 'String';
       case FieldDescriptorProto_Type.TYPE_ENUM:
-        return 'dynamic';
+        return 'int';
+      // if (generator?.classname != null) {
+      //   return '${generator?.classname}Enum'.pascalCase;
+      // }
+      // return 'dynamic';
       case FieldDescriptorProto_Type.TYPE_GROUP:
         return 'List<$className>';
       case FieldDescriptorProto_Type.TYPE_MESSAGE:
         return className;
       default:
         return 'dynamic';
+    }
+  }
+
+  String get mapperTo {
+    switch (descriptor) {
+      case FieldDescriptorProto_Type.TYPE_INT32:
+      case FieldDescriptorProto_Type.TYPE_SINT32:
+      case FieldDescriptorProto_Type.TYPE_SFIXED32:
+      case FieldDescriptorProto_Type.TYPE_UINT32:
+      case FieldDescriptorProto_Type.TYPE_UINT64:
+      case FieldDescriptorProto_Type.TYPE_FIXED32:
+      case FieldDescriptorProto_Type.TYPE_INT64:
+      case FieldDescriptorProto_Type.TYPE_SINT64:
+      case FieldDescriptorProto_Type.TYPE_SFIXED64:
+        return '.toInt()';
+      default:
+        return '';
     }
   }
 

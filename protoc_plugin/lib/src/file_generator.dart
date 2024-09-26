@@ -117,6 +117,7 @@ class FileGenerator extends ProtobufContainer {
   final enumGenerators = <EnumGenerator>[];
   final messageGenerators = <MessageGenerator>[];
   final entityGenerators = <EntityGenerator>[];
+  final mapperGenerators = <MapperGenerator>[];
   final enumEntityGenerators = <EnumEntityGenerator>[];
   final extensionGenerators = <ExtensionGenerator>[];
   final clientApiGenerators = <ClientApiGenerator>[];
@@ -174,6 +175,8 @@ class FileGenerator extends ProtobufContainer {
           this, declaredMixins, defaultMixin, usedTopLevelNames, i));
       entityGenerators
           .add(EntityGenerator.topLevel(descriptor.messageType[i], this, i));
+      mapperGenerators
+          .add(MapperGenerator.topLevel(descriptor.messageType[i], this, i));
     }
     for (var i = 0; i < descriptor.extension.length; i++) {
       extensionGenerators.add(ExtensionGenerator.topLevel(
@@ -202,6 +205,9 @@ class FileGenerator extends ProtobufContainer {
       m.resolve(ctx);
     }
     for (final x in entityGenerators) {
+      x.resolve(ctx);
+    }
+    for (final x in mapperGenerators) {
       x.resolve(ctx);
     }
     for (final x in extensionGenerators) {
@@ -245,11 +251,13 @@ class FileGenerator extends ProtobufContainer {
     final enumWriter = generateEnumFile(config);
     final entityWrite = generateEntityFile(config);
     final enumEntityWrite = generateEnumEntityFile(config);
+    final mapperWrite = generateMapperFile(config);
 
     final files = [
       makeFile('.pb.dart', mainWriter.toString()),
       makeFile('_entity.dart', entityWrite.toString()),
       makeFile('_enum.dart', enumEntityWrite.toString()),
+      makeFile('_mapper.dart', mapperWrite.toString()),
       makeFile('.pbenum.dart', enumWriter.toString()),
       makeFile('.pbjson.dart', generateJsonFile(config)),
     ];
@@ -275,6 +283,36 @@ class FileGenerator extends ProtobufContainer {
   /// Creates an IndentingWriter with metadata generation enabled or disabled.
   IndentingWriter makeWriter() => IndentingWriter(
       filename: options.generateMetadata ? descriptor.name : null);
+
+  IndentingWriter generateMapperFile(
+      [OutputConfiguration config = const DefaultOutputConfiguration()]) {
+    if (!_linked) throw StateError('not linked');
+
+    final out = makeWriter();
+
+    final importWriter = ImportWriter();
+
+    final imports = Set<FileGenerator>.identity();
+
+    for (final m in entityGenerators) {
+      m.addImportsTo(imports, {});
+    }
+
+    for (final target in imports) {
+      final entityUrl = config.resolveImport(
+          target.protoFileUri, protoFileUri, '_entity.dart');
+      final pbUrl =
+          config.resolveImport(target.protoFileUri, protoFileUri, '.pb.dart');
+      importWriter.addImport(entityUrl.toString());
+      importWriter.addImport(pbUrl.toString());
+    }
+
+    out.println(importWriter.emit());
+    for (final m in mapperGenerators) {
+      m.generate(out);
+    }
+    return out;
+  }
 
   IndentingWriter generateEnumEntityFile(
       [OutputConfiguration config = const DefaultOutputConfiguration()]) {
@@ -310,6 +348,12 @@ class FileGenerator extends ProtobufContainer {
     for (final target in imports) {
       final url = config.resolveImport(
           target.protoFileUri, protoFileUri, '_entity.dart');
+      importWriter.addImport(url.toString());
+    }
+
+    for (final target in enumImports) {
+      final url =
+          config.resolveImport(target.protoFileUri, protoFileUri, '_enum.dart');
       importWriter.addImport(url.toString());
     }
 
