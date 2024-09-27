@@ -52,12 +52,12 @@ class BaseType {
       case FieldDescriptorProto_Type.TYPE_FLOAT:
       case FieldDescriptorProto_Type.TYPE_DOUBLE:
         return 'double';
-      case FieldDescriptorProto_Type.TYPE_INT32:
-      case FieldDescriptorProto_Type.TYPE_INT64:
       case FieldDescriptorProto_Type.TYPE_UINT32:
         return 'Int32';
       case FieldDescriptorProto_Type.TYPE_UINT64:
         return 'Int64';
+      case FieldDescriptorProto_Type.TYPE_INT32:
+      case FieldDescriptorProto_Type.TYPE_INT64:
       case FieldDescriptorProto_Type.TYPE_SINT32:
       case FieldDescriptorProto_Type.TYPE_SINT64:
       case FieldDescriptorProto_Type.TYPE_FIXED32:
@@ -81,23 +81,6 @@ class BaseType {
         return className;
       default:
         return 'dynamic';
-    }
-  }
-
-  String get mapperTo {
-    switch (descriptor) {
-      case FieldDescriptorProto_Type.TYPE_INT32:
-      case FieldDescriptorProto_Type.TYPE_SINT32:
-      case FieldDescriptorProto_Type.TYPE_SFIXED32:
-      case FieldDescriptorProto_Type.TYPE_UINT32:
-      case FieldDescriptorProto_Type.TYPE_UINT64:
-      case FieldDescriptorProto_Type.TYPE_FIXED32:
-      case FieldDescriptorProto_Type.TYPE_INT64:
-      case FieldDescriptorProto_Type.TYPE_SINT64:
-      case FieldDescriptorProto_Type.TYPE_SFIXED64:
-        return '.toInt()';
-      default:
-        return '';
     }
   }
 

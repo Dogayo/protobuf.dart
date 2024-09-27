@@ -112,8 +112,7 @@ class MapperGenerator extends ProtobufContainer {
           } else if (field.baseType.isEnum) {
             out.println('$fieldName:  dto.$fieldName.value,');
           } else {
-            final mapper = field.isRepeated ? '' : field.baseType.mapperTo;
-            out.println('$fieldName: dto.$fieldName$mapper,');
+            out.println('$fieldName: dto.$fieldName,');
           }
         }
       }
