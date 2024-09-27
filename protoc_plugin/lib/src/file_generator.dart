@@ -294,7 +294,7 @@ class FileGenerator extends ProtobufContainer {
 
     final imports = Set<FileGenerator>.identity();
 
-    for (final m in entityGenerators) {
+    for (final m in mapperGenerators) {
       m.addImportsTo(imports, {});
     }
 

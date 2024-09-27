@@ -98,8 +98,8 @@ class MapperGenerator extends ProtobufContainer {
       out.println('static $_entityClassName fromDto($_protoClassName dto) {');
       out.println('  return $_entityClassName(');
       for (final field in _fieldList) {
-        out.println(
-            '/// ${field.baseType.descriptor.name} ${field.isRepeated}');
+        // out.println(
+        //     '/// ${field.baseType.descriptor.name} ${field.isRepeated}');
 
         final fieldName = field.memberNames!.fieldName;
         if (field.isRepeated && field.baseType.isMessage) {
@@ -123,8 +123,8 @@ class MapperGenerator extends ProtobufContainer {
       out.println('static $_protoClassName toDto($_entityClassName entity) {');
       out.println('  return $_protoClassName(');
       for (final field in _fieldList) {
-        out.println(
-            '/// ${field.baseType.descriptor.name} ${field.isRepeated}');
+        // out.println(
+        // '/// ${field.baseType.descriptor.name} ${field.isRepeated}');
 
         final fieldName = field.memberNames!.fieldName;
 
@@ -153,6 +153,28 @@ class MapperGenerator extends ProtobufContainer {
     });
     for (final m in _mapperGenerators) {
       m.generate(out);
+    }
+  }
+
+  void addImportsTo(
+      Set<FileGenerator> imports, Set<FileGenerator> enumImports) {
+    for (final field in _fieldList) {
+      final typeGen = field.baseType.generator;
+      if (typeGen is EnumEntityGenerator) {
+        enumImports.add(typeGen.fileGen!);
+      } else if (typeGen != null) {
+        imports.add(typeGen.fileGen!);
+      }
+    }
+
+    final nonNestedType = _fieldList.every((e) => e.baseType.generator == null);
+
+    if (nonNestedType) {
+      imports.add(fileGen!);
+    }
+
+    for (final m in _mapperGenerators) {
+      m.addImportsTo(imports, enumImports);
     }
   }
 }
