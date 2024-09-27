@@ -340,6 +340,10 @@ class FileGenerator extends ProtobufContainer {
 
     final importWriter = ImportWriter();
 
+    if (_needsFixnumImport) {
+      importWriter.addImport('package:fixnum/fixnum.dart');
+    }
+
     // Import the _entity.dart files we depend on.
     final imports = Set<FileGenerator>.identity();
     final enumImports = Set<FileGenerator>.identity();

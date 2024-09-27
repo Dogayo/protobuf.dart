@@ -92,6 +92,13 @@ class EntityGenerator extends ProtobufContainer {
     }
   }
 
+  bool get needsFixnumImport {
+    for (final field in _fieldList) {
+      if (field.needsFixnumImport) return true;
+    }
+    return false;
+  }
+
   void generate(IndentingWriter out) {
     /// Start class
     out.println('class $_className extends Equatable  {');
