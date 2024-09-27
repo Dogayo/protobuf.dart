@@ -54,10 +54,10 @@ class BaseType {
         return 'double';
       case FieldDescriptorProto_Type.TYPE_UINT32:
         return 'Int32';
+      case FieldDescriptorProto_Type.TYPE_INT64:
       case FieldDescriptorProto_Type.TYPE_UINT64:
         return 'Int64';
       case FieldDescriptorProto_Type.TYPE_INT32:
-      case FieldDescriptorProto_Type.TYPE_INT64:
       case FieldDescriptorProto_Type.TYPE_SINT32:
       case FieldDescriptorProto_Type.TYPE_SINT64:
       case FieldDescriptorProto_Type.TYPE_FIXED32:
