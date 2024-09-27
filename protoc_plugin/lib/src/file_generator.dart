@@ -299,12 +299,18 @@ class FileGenerator extends ProtobufContainer {
     }
 
     for (final target in imports) {
-      final entityUrl = config.resolveImport(
-          target.protoFileUri, protoFileUri, '_entity.dart');
-      final pbUrl =
-          config.resolveImport(target.protoFileUri, protoFileUri, '.pb.dart');
-      importWriter.addImport(entityUrl.toString());
-      importWriter.addImport(pbUrl.toString());
+      if (imports.length > 1 && target == imports.last) {
+        final mapperUrl = config.resolveImport(
+            target.protoFileUri, protoFileUri, '_mapper.dart');
+        importWriter.addImport(mapperUrl.toString());
+      } else {
+        final entityUrl = config.resolveImport(
+            target.protoFileUri, protoFileUri, '_entity.dart');
+        final pbUrl =
+            config.resolveImport(target.protoFileUri, protoFileUri, '.pb.dart');
+        importWriter.addImport(entityUrl.toString());
+        importWriter.addImport(pbUrl.toString());
+      }
     }
 
     out.println(importWriter.emit());

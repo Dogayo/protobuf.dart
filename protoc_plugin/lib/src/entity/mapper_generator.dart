@@ -135,7 +135,7 @@ class MapperGenerator extends ProtobufContainer {
         final nullableRequired = !field.isRequired ? '!' : '';
         if (field.isRepeated && field.baseType.isMessage) {
           out.println(
-              '$fieldName: entity.$fieldName$nullableOptional.map(${field.baseType.onlyDart(_prefixMapper).pascalCase}.toDto).toList(),');
+              '$fieldName: entity.$fieldName$nullableOptional.map(${field.baseType.onlyDart(_prefixMapper).pascalCase}.toDto),');
         } else {
           if (field.baseType.isMessage) {
             out.println(
@@ -153,19 +153,6 @@ class MapperGenerator extends ProtobufContainer {
     });
     for (final m in _mapperGenerators) {
       m.generate(out);
-    }
-  }
-
-  void addImportsTo(
-      Set<FileGenerator> imports, Set<FileGenerator> enumImports) {
-    for (final field in _fieldList) {
-      final typeGen = field.baseType.generator;
-      if (typeGen != null) {
-        imports.add(typeGen.fileGen!);
-      }
-    }
-    for (final m in _mapperGenerators) {
-      m.addImportsTo(imports, enumImports);
     }
   }
 }
